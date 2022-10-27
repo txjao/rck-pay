@@ -49,3 +49,70 @@ const expireMask = {
 }
 var expireMasked = IMask(expire, expireMask);
 
+const maskNumCard = {
+  mask: [
+    {
+      mask: '0000 0000 0000 0000',
+      cardtype: 'visa',
+      regex: /^4\d{0,15}/,
+    },
+    {
+      mask: '0000 0000 0000 0000',
+      cardtype: 'mastercard',
+      regex: /(^5[1-5]\d{0,2} | ^22[2-9]\d | ^2[3-7]\d{0,2})\d{0,12}/,
+    },
+    {
+      mask: '0000 0000 0000 0000',
+      cardtype: 'default'
+    }
+  ],
+  dispatch: function (appended, dynamicMask) {
+    const number = (dynamicMask.value + appended).replace(/\D/g, '')
+
+    const card = dynamicMask.compiledMasks.find(({ mask }) =>
+      number.match(mask.regex)
+    )
+    console.log(card)
+
+    return card
+  }
+}
+
+var numCardMasked = IMask(numCard, maskNumCard);
+
+const addButton = document.getElementById("button");
+
+addButton.addEventListener("click", () => {
+  console.log("clicou")
+
+});
+
+
+
+document.querySelector("form").addEventListener("submit", (event) => {
+  event.preventDefault();
+});
+
+
+const cardHolder = document.getElementById("card-holder")
+cardHolder.addEventListener("input", () => {
+  const ccHolder = document.querySelector(".cc-holder .value")
+
+  ccHolder.innerText = cardHolder.value.length === 0 ? "FULANO DA SILVA" : cardHolder.value
+})
+
+cvcMasked.on("accept", (code) => {
+  code = cvcMasked.value
+
+  const ccSecurity = document.querySelector(".cc-security .value")
+  ccSecurity.innerText = code.length === 0 ? "1234" : code
+
+})
+
+numCardMasked.on("accept", (number) => {
+  number = numCardMasked.value
+
+  const ccSecurity = document.querySelector(".cc-info .number")
+  ccSecurity.innerText = number.length === 0 ? "0000 0000 0000 0000" : code
+
+})
